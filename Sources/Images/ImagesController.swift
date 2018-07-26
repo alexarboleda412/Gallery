@@ -157,6 +157,14 @@ extension ImagesController: PageAware {
 
 extension ImagesController: CartDelegate {
 
+    func cart(_ cart: Cart, didAdd image: UIImage, newlyTaken: Bool) {
+        refreshView()
+
+        if newlyTaken {
+            refreshSelectedAlbum()
+        }
+    }
+
   func cart(_ cart: Cart, didAdd image: Image, newlyTaken: Bool) {
     stackView.reload(cart.images, added: true)
     refreshView()

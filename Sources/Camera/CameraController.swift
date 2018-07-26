@@ -126,7 +126,7 @@ class CameraController: UIViewController {
       strongSelf.cameraView.stackView.stopLoading()
 
       if let asset = asset {
-        strongSelf.cart.add(Image(asset: asset), newlyTaken: true)
+        strongSelf.cart.add(asset, newlyTaken: true)
       }
     }
   }
@@ -164,6 +164,10 @@ class CameraController: UIViewController {
 }
 
 extension CameraController: CartDelegate {
+
+    func cart(_ cart: Cart, didAdd image: UIImage, newlyTaken: Bool) {
+        refreshView()
+    }
 
   func cart(_ cart: Cart, didAdd image: Image, newlyTaken: Bool) {
     cameraView.stackView.reload(cart.images, added: true)

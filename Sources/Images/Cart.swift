@@ -2,6 +2,7 @@ import UIKit
 import Photos
 
 public protocol CartDelegate: class {
+    func cart(_ cart: Cart, didAdd image: UIImage, newlyTaken: Bool)
   func cart(_ cart: Cart, didAdd image: Image, newlyTaken: Bool)
   func cart(_ cart: Cart, didRemove image: Image)
   func cartDidReload(_ cart: Cart)
@@ -27,6 +28,12 @@ public class Cart {
   }
 
   // MARK: - Logic
+
+    public func add(_ image: UIImage, newlyTaken: Bool = false) {
+        for case let delegate as CartDelegate in delegates.allObjects {
+            delegate.cart(self, didAdd: image, newlyTaken: newlyTaken)
+        }
+    }
 
   public func add(_ image: Image, newlyTaken: Bool = false) {
     guard !images.contains(image) else { return }

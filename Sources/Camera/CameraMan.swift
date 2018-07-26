@@ -126,7 +126,7 @@ class CameraMan {
     }
   }
 
-  func takePhoto(_ previewLayer: AVCaptureVideoPreviewLayer, location: CLLocation?, completion: @escaping ((PHAsset?) -> Void)) {
+  func takePhoto(_ previewLayer: AVCaptureVideoPreviewLayer, location: CLLocation?, completion: @escaping ((UIImage?) -> Void)) {
     guard let connection = stillImageOutput?.connection(with: .video) else { return }
 
     connection.videoOrientation = Utils.videoOrientation()
@@ -136,8 +136,7 @@ class CameraMan {
         buffer, error in
 
         guard error == nil, let buffer = buffer, CMSampleBufferIsValid(buffer),
-          let imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(buffer),
-          let image = UIImage(data: imageData)
+          let imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(buffer)
           else {
             DispatchQueue.main.async {
               completion(nil)
@@ -145,37 +144,41 @@ class CameraMan {
             return
         }
 
-        self.savePhoto(image, location: location, completion: completion)
+        let image = UIImage(data: imageData)
+        self.savePhoto(image!, location: location, completion: completion)
       }
     }
   }
 
-  func savePhoto(_ image: UIImage, location: CLLocation?, completion: @escaping ((PHAsset?) -> Void)) {
-    var localIdentifier: String?
+  func savePhoto(_ image: UIImage, location: CLLocation?, completion: @escaping ((UIImage?) -> Void)) {
+    //var localIdentifier: String?
 
-    savingQueue.async {
-      do {
-        try PHPhotoLibrary.shared().performChangesAndWait {
-          let request = PHAssetChangeRequest.creationRequestForAsset(from: image)
-          localIdentifier = request.placeholderForCreatedAsset?.localIdentifier
+    completion(image)
 
-          request.creationDate = Date()
-          request.location = location
-        }
-
-        DispatchQueue.main.async {
-          if let localIdentifier = localIdentifier {
-            completion(Fetcher.fetchAsset(localIdentifier))
-          } else {
-            completion(nil)
-          }
-        }
-      } catch {
-        DispatchQueue.main.async {
-          completion(nil)
-        }
-      }
-    }
+//    savingQueue.async {
+//      do {
+//        try PHPhotoLibrary.shared().performChangesAndWait {
+//          let request = PHAssetChangeRequest.creationRequestForAsset(from: image)
+//          localIdentifier = request.placeholderForCreatedAsset?.localIdentifier
+//
+//          request.creationDate = Date()
+//          request.location = location
+//        }
+//
+//        DispatchQueue.main.async {
+//          if let localIdentifier = localIdentifier {
+//            let asset =
+//            completion(Fetcher.fetchAsset(localIdentifier))
+//          } else {
+//            completion(nil)
+//          }
+//        }
+//      } catch {
+//        DispatchQueue.main.async {
+//          completion(nil)
+//        }
+//      }
+//    }
   }
 
   func flash(_ mode: AVCaptureDevice.FlashMode) {
